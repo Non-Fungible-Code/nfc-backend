@@ -1,0 +1,34 @@
+{
+  "name": "nfc-backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "repository": "git@github.com:Non-Fungible-Code/nfc-backend.git",
+  "author": "Harry Chang <harry830622@gmail.com>",
+  "scripts": {
+    "dev": "nodemon ./server.js",
+    "start": "NODE_ENV=production node ./server.js"
+  },
+  "dependencies": {
+    "@koa/cors": "^3.1.0",
+    "@koa/router": "^10.0.0",
+    "axios": "^0.21.1",
+    "dotenv": "^10.0.0",
+    "form-data": "^4.0.0",
+    "formidable": "https://github.com/node-formidable/formidable.git",
+    "koa": "^2.13.1",
+    "koa-body": "^4.2.0",
+    "uuid": "^8.3.2",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.14.3",
+    "@babel/eslint-parser": "^7.14.4",
+    "eslint": "^7.2.0",
+    "eslint-config-airbnb-base": "14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prettier": "^3.4.0",
+    "nodemon": "^2.0.7",
+    "prettier": "^2.3.1"
+  }
+}
