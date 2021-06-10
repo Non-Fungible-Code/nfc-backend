@@ -15,6 +15,7 @@ require('dotenv').config();
 
 const {
   NODE_ENV = 'development',
+  DEBUG = true,
   PORT = '3000',
   KEY = 'dev',
   CORS_ORIGIN,
@@ -24,7 +25,7 @@ const {
 
 (async () => {
   const logger = winston.createLogger({
-    level: NODE_ENV === 'development' ? 'silly' : 'info',
+    level: DEBUG ? 'silly' : 'info',
     transports: [new winston.transports.Console()],
     format: winston.format.combine(
       winston.format.label(),
@@ -70,17 +71,26 @@ const {
             cidVersion: 1,
           }),
         );
+        const rootDir = path.resolve('/', uuidv4());
         const form = formidable({
           multiples: true,
           keepExtensions: true,
-          uploadDir: path.resolve('/', uuidv4()),
-          filter: (part) => ['files'].includes(part.name),
-          filename: (name, ext) =>
+          uploadDir: '/',
+          filter: (part) => ['files', 'file'].includes(part.name),
+          filename: (name, ext, part) =>
             path.format({
-              ...(path.dirname(name) && {
-                dir: path.dirname(name).split(path.sep).slice(1).join(path.sep),
-              }),
-              name: path.basename(name),
+              ...(part.name === 'files' &&
+                path.dirname(part.originalFilename) && {
+                  dir: path.resolve(
+                    rootDir,
+                    path
+                      .dirname(part.originalFilename)
+                      .split(path.sep)
+                      .slice(1)
+                      .join(path.sep),
+                  ),
+                }),
+              name,
               ext,
             }),
           fileWriteStreamHandler: (file) => {
@@ -91,7 +101,6 @@ const {
             return passStream;
           },
         });
-        console.log(pinataForm);
         await new Promise((resolve, reject) => {
           form.parse(ctx.req, (err, fields, files) => {
             if (err) {
@@ -106,7 +115,6 @@ const {
         await next();
       },
       async (ctx) => {
-        console.log(ctx.form);
         const res = await axios.post(
           `${new URL('/pinning/pinFileToIPFS', 'https://api.pinata.cloud')}`,
           ctx.pinataForm,
