@@ -18,6 +18,7 @@ const {
   DEBUG = true,
   PORT = '3000',
   KEY = 'dev',
+  NETWORK,
   CORS_ORIGIN,
   PINATA_API_KEY,
   PINATA_API_SECRET,
@@ -65,12 +66,6 @@ const {
           pauseStreams: false,
           maxDataSize: 10 * 1024 * 1024,
         });
-        pinataForm.append(
-          'pinataOptions',
-          JSON.stringify({
-            cidVersion: 1,
-          }),
-        );
         const rootDir = path.resolve('/', uuidv4());
         const form = formidable({
           multiples: true,
@@ -115,6 +110,22 @@ const {
         await next();
       },
       async (ctx) => {
+        ctx.pinataForm.append(
+          'pinataMetadata',
+          JSON.stringify({
+            name: ctx.form.fields.name,
+            keyvalues: {
+              project: 'NFC',
+              network: NETWORK,
+            },
+          }),
+        );
+        ctx.pinataForm.append(
+          'pinataOptions',
+          JSON.stringify({
+            cidVersion: 1,
+          }),
+        );
         const res = await axios.post(
           `${new URL('/pinning/pinFileToIPFS', 'https://api.pinata.cloud')}`,
           ctx.pinataForm,
